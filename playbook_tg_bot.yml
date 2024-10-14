@@ -1,0 +1,113 @@
+- name: Configure main DB
+  hosts: db-main
+  become: yes
+  vars:
+    tmp_conf_dir: /tmp/conf
+
+  tasks:
+    - name: Install PostgreSQL
+      apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+          - postgresql-common
+        state: latest
+
+    - name: Copy configuration files
+      copy:
+        src: "{{ item }}"
+        dest: "{{ tmp_conf_dir }}"
+      loop:
+        - db/
+        - .env
+
+    - name: Configure PostgreSQL
+      become: yes
+      shell:
+        cmd: |
+          mkdir -p /oracle/pg_data/archive
+          chown -R postgres:postgres /oracle
+          cat {{ tmp_conf_dir }}/postgresql.conf >> /etc/postgresql/*/main/postgresql.conf
+          cat {{ tmp_conf_dir }}/pg_hba.conf >> /etc/postgresql/*/main/pg_hba.conf
+          chmod +x {{ tmp_conf_dir }}/init.sh
+          sudo -u postgres env $(<{{ tmp_conf_dir }}/.env) {{ tmp_conf_dir }}/init.sh
+        executable: /bin/bash
+
+    - name: Restart PostgreSQL
+      service:
+        name: postgresql
+        state: restarted
+
+
+- name: Configure repl DB
+  hosts: db-repl
+  become: yes
+  vars:
+    tmp_conf_dir: /tmp/conf
+
+  tasks:
+    - name: Install PostgreSQL
+      apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+          - postgresql-common
+        state: latest
+
+    - name: Copy configuration files
+      copy:
+        src: "{{ item }}"
+        dest: "{{ tmp_conf_dir }}"
+      loop:
+        - db_repl/
+        - .env
+
+    - name: Configure PostgreSQL
+      become: yes
+      shell:
+        cmd: |
+          chmod +x {{ tmp_conf_dir }}/init.sh
+          sudo -u postgres env $(<{{ tmp_conf_dir }}/.env) {{ tmp_conf_dir }}/init.sh
+        executable: /bin/bash
+
+    - name: Restart PostgreSQL
+      service:
+        name: postgresql
+        state: restarted
+
+
+- name: Configure Bot
+  hosts: bot
+  become: yes
+  vars:
+    base_dir: /home/ansible/bot-infra
+
+  tasks:
+    - name: Install dependencies
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-virtualenv
+          - git
+        state: latest
+
+    - name: Clone source code
+      git:
+        repo: https://github.com/YariKartoshe4ka/ptstart-devops-bot-exam
+        dest: "{{ base_dir }}"
+        version: docker
+        force: yes
+
+    - name: Install Python dependencies
+      pip:
+        virtualenv: "{{ base_dir }}/venv"
+        requirements: "{{ base_dir }}/bot/requirements.txt"
+
+    - name: Copy dotenv file
+      copy: src=.env dest="{{ base_dir }}/bot/.env"
+
+    - name: Run project
+      shell:
+        cmd: . ../venv/bin/activate && nohup python -m main &
+        chdir: "{{ base_dir }}/bot"

@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  bot:
+    depends_on:
+      - db-main
+      - db-repl
+
+    build: bot
+
+  db-main:
+    build: db
+    environment:
+      DB_USER: admtgbot
+      DB_PASSWORD: "S3cuR3_PaSs_f0r_DB_adm"
+      DB_REPL_USER: repluser
+      DB_REPL_PASSWORD: "S3cuR3_PaSs_f0r_DB_repl"
+      DB_DATABASE: tgbot
+
+      POSTGRES_PASSWORD: LVnnQfM3YmXB
+      POSTGRES_HOST_AUTH_METHOD: |
+        scram-sha-256
+        host replication all all scram-sha-256
+
+    restart: on-failure:5
+
+  db-repl:
+    depends_on:
+      - db-main
+
+    build: db_repl
+    environment:
+      DB_HOST_MASTER: db-main
+      DB_REPL_USER: repluser
+      DB_REPL_PASSWORD: "S3cuR3_PaSs_f0r_DB_repl"
+
+      POSTGRES_PASSWORD: WucgjJWUwtuD
+
+
+    restart: on-failure:5

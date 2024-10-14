@@ -1,0 +1,6 @@
+__pycache__
+*.pyc
+/venv
+/logs.txt
+/packages.txt
+/test.txt

@@ -1,16 +1,15 @@
 ### Использование
 
-Отредактируйте `.env` файл в корне проекта и скопируйте его в `bot/.env`
+1. Отредактируйте `.env` файл в корне проекта
 
-```bash
-git clone https://github.com/YariKartoshe4ka/ptstart-devops-bot-exam
-cd ptstart-devops-bot-exam
-nano .env
-cp .env bot/.env
-```
+    ```bash
+    git clone https://github.com/YariKartoshe4ka/ptstart-devops-bot-exam
+    cd ptstart-devops-bot-exam
+    nano .env
+    ```
 
-Запустите проект
+2. Запустите проект
 
-```bash
-docker compose up --build
-```
+    ```bash
+    docker compose up --build
+    ```

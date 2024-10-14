@@ -7,6 +7,7 @@ services:
       - db-repl
 
     build: bot
+    env_file: .env
 
   db-main:
     build: db

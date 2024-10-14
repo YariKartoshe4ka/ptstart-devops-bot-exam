@@ -1,6 +1,5 @@
 __pycache__
 
-/bot/.env
 /bot/logs.txt
 /bot/test.txt
 /bot/packages.txt

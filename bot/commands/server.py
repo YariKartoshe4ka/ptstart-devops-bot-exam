@@ -136,7 +136,7 @@ async def command_get_repl_logs(message: Message) -> None:
         url=URL.create(
             'postgresql+asyncpg',
             username='postgres',
-            password='LVnnQfM3YmXB',
+            password=getenv('DB_PASSWORD'),
             host=getenv('DB_HOST'),
             port=getenv('DB_PORT'),
         ),

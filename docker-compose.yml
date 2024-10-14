@@ -10,14 +10,9 @@ services:
 
   db-main:
     build: db
+    env_file: .env
     environment:
-      DB_USER: admtgbot
-      DB_PASSWORD: "S3cuR3_PaSs_f0r_DB_adm"
-      DB_REPL_USER: repluser
-      DB_REPL_PASSWORD: "S3cuR3_PaSs_f0r_DB_repl"
-      DB_DATABASE: tgbot
-
-      POSTGRES_PASSWORD: LVnnQfM3YmXB
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: |
         scram-sha-256
         host replication all all scram-sha-256
@@ -29,12 +24,8 @@ services:
       - db-main
 
     build: db_repl
+    env_file: .env
     environment:
-      DB_HOST_MASTER: db-main
-      DB_REPL_USER: repluser
-      DB_REPL_PASSWORD: "S3cuR3_PaSs_f0r_DB_repl"
-
-      POSTGRES_PASSWORD: WucgjJWUwtuD
-
+      POSTGRES_PASSWORD: ${DB_REPL_PASSWORD}
 
     restart: on-failure:5
